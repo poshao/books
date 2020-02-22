@@ -179,6 +179,10 @@ aria2_init_conf(){
 	    cp ${ARIA2_PATH}/aria2.conf.sample ${ARIA2_PATH}/aria2.conf
 	fi
 
+    if [ ！ -e ${ARIA2_SESSION} ]; then
+        touch ${ARIA2_SESSION}
+    fi
+
 	#read -p "input download dir(${ARIA2_DWDIR}):" ARIA2_DWDIR
 	#read -p "input rpc secret(${ARIA2_RPC_SECRET}):" ARIA2_RPC_SERCRET
 
@@ -240,7 +244,7 @@ aria2_restart(){
 aria2_bt_update(){
 	echo 'bt-tracker update...'
 	list=`wget -qO- https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt|awk NF|sed ":a;N;s/\n/,/g;ta"`
-	if [ ! -z $list]; then
+	if [ ! -z $list ]; then
 		if [ -z "`grep "bt-tracker" ${ARIA2_CONF}`" ]; then
 			sed -i '$a bt-tracker='${list} ${ARIA2_CONF}
 			echo add......
