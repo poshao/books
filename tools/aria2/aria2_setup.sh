@@ -3,8 +3,9 @@
 # setup for aria2
 
 ARIA2_PATH=$(pwd)
-ARIA2_DWDIR=$HOME/download
-ARIA2_DWCDIR=$ARIA2_DWDIR/complete
+ARIA2_DWFOLDER=$HOME/download
+ARIA2_DWDIR=$ARIA2_DWFOLDER/download
+ARIA2_DWCDIR=$ARIA2_DWFOLDER/complete
 ARIA2_SESSION=$ARIA2_PATH/aria2.session
 ARIA2_DHT=$ARIA2_PATH/dht.dat
 ARIA2_DHT6=$ARIA2_PATH/dht6.dat
@@ -13,6 +14,14 @@ ARIA2_RPC_SECRET='hellohanmeimei'
 ARIA2_CONF=$ARIA2_PATH/aria2.conf
 
 aria2_init_conf(){
+	if [ `echo $0 | grep -P '/' -o | wc -l` -gt 1 ]; then
+		echo 'please change to aria2 folder and run again!'
+		exit 0
+	fi
+
+	ARIA2_PATH=$(pwd)
+	sed -i "s!^ARIA2_PATH=.*!ARIA2_PATH=$ARIA2_PATH!g" $0
+
 	if [ ! -e ${ARIA2_CONF} ]; then
 	    cp ${ARIA2_PATH}/aria2.conf.sample ${ARIA2_PATH}/aria2.conf
 	fi
@@ -43,7 +52,7 @@ aria2_init_conf(){
 			if [ -z "`grep 'ARIA2_DWCDIR' ${event_path}`" ]; then
 				sed -i '2 iARIA2_DWCDIR='$ARIA2_DWCDIR ${event_path}
 			else
-				sed -i "s!ARIA2_DWCDIR.*!ARIA2_DWCDIR=$ARIA2_DWCDIR!g" ${event_path}
+				sed -i "s!^ARIA2_DWCDIR.*!ARIA2_DWCDIR=$ARIA2_DWCDIR!g" ${event_path}
 			fi
 
 			if [ -z "`grep "on-${event_name}" ${ARIA2_CONF}`" ]; then
@@ -91,7 +100,7 @@ aria2_stop(){
 }
 
 aria2_restart(){
-	echo 'restart arai2...'
+	echo 'restart aria2...'
 	killall aria2c
 	sleep 1s
 	/usr/bin/aria2c --conf-path=${ARIA2_CONF}
